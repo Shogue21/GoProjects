@@ -8,25 +8,44 @@ import (
 const (
 	newBookCost = 6.0
 	oldBookCost = 3.5
+	couponIndex = 0
 )
+
+var coupons = []string{
+	"free-stuff",
+	"half-off",
+}
+var discounts = []float64{
+	0.0,
+	0.5,
+}
 
 func computeCost(new, old float64) float64 {
 	return new*newBookCost + old*oldBookCost
 }
 
-func applyCouponDiscount(cost float64, coupon string) float64 {
-	if coupon == "free-stuff" {
-		return 0
-	} else if coupon == "half-off" {
-		return cost * 0.5
-	} else {
-		return cost
+func index(item string, list []string) int {
+	itemIndex := 0
+	for i, c := range list {
+		if c == item {
+			itemIndex = i
+			fmt.Println("made it!")
+		}
 	}
+	return itemIndex
 }
-
 func isValidCoupon(coupon string) bool {
 	return bool(coupon == "free-stuff" || coupon == "half-off")
 }
+
+func applyCouponDiscount(cost float64, coupon string) float64 {
+	couponIndex := index(coupon, coupons)
+	if isValidCoupon(coupon) {
+		cost = cost * discounts[couponIndex]
+	}
+	return cost
+}
+
 func main() {
 
 	fmt.Println("Welcome to Bargain Books!")
