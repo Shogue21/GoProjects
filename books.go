@@ -6,7 +6,7 @@ import (
 )
 
 const (
-	newBookCost = 6
+	newBookCost = 6.0
 	oldBookCost = 3.5
 )
 
@@ -30,8 +30,8 @@ func isValidCoupon(coupon string) bool {
 func main() {
 
 	fmt.Println("Welcome to Bargain Books!")
-	fmt.Println("New books are $", newBookCost, "each.")
-	fmt.Println("Old books are $", oldBookCost, "each.")
+	fmt.Printf("New books are $%.2f each.\n", newBookCost)
+	fmt.Printf("Old books are $%.2f each.\n", oldBookCost)
 
 	fmt.Println("How many new books are you buying today?")
 	var newBooks int
@@ -59,5 +59,5 @@ func main() {
 		}
 	}
 
-	fmt.Println("That will be $", total)
+	fmt.Printf("That will be $%.2f", total)
 }
