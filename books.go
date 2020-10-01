@@ -11,14 +11,16 @@ const (
 	couponIndex = 0
 )
 
-var coupons = []string{
-	"free-stuff",
-	"half-off",
-}
-var discounts = []float64{
-	0.0,
-	0.5,
-}
+var (
+	coupons = []string{
+		"free-stuff",
+		"half-off",
+	}
+	discounts = []float64{
+		0.0,
+		0.5,
+	}
+)
 
 func computeCost(new, old float64) float64 {
 	return new*newBookCost + old*oldBookCost
