@@ -20,6 +20,9 @@ var (
 		0.0,
 		0.5,
 	}
+	hasCoupon string
+	newBooks  int
+	oldBooks  int
 )
 
 func computeCost(new, old float64) float64 {
@@ -31,7 +34,6 @@ func index(item string, list []string) int {
 	for i, c := range list {
 		if c == item {
 			itemIndex = i
-			fmt.Println("made it!")
 		}
 	}
 	return itemIndex
@@ -54,20 +56,36 @@ func main() {
 	fmt.Printf("New books are $%.2f each.\n", newBookCost)
 	fmt.Printf("Old books are $%.2f each.\n", oldBookCost)
 
-	fmt.Println("How many new books are you buying today?")
-	var newBooks int
-	fmt.Scanln(&newBooks)
+	for {
+		fmt.Println("How many new books are you buying today?")
+		fmt.Scanln(&newBooks)
+		if newBooks < 0 {
+			fmt.Println("Please select a value of 0 or greater.")
+		} else {
+			break
+		}
+	}
+	for {
+		fmt.Println("How many old books are you buying today?")
+		fmt.Scanln(&oldBooks)
+		if oldBooks < 0 {
+			fmt.Println("Please select a value of 0 or greater.")
+		} else {
+			break
+		}
+	}
 
-	fmt.Println("How many old books are you buying today?")
-	var oldBooks int
-	fmt.Scanln(&oldBooks)
 	total := computeCost(float64(newBooks), float64(oldBooks))
-
-	fmt.Println("Do you have a coupon? [Y/N]: ")
-	var hasCoupon string
-	fmt.Scanln(&hasCoupon)
-	hasCoupon = strings.ToLower(hasCoupon)
-
+	for {
+		fmt.Println("Do you have a coupon? [Y/N]: ")
+		fmt.Scanln(&hasCoupon)
+		hasCoupon = strings.ToLower(hasCoupon)
+		if hasCoupon != "y" && hasCoupon != "n" {
+			fmt.Println("Please provide valid input.")
+		} else {
+			break
+		}
+	}
 	if hasCoupon == "y" {
 		fmt.Println("What is your coupon? ")
 		var coupon string
@@ -79,6 +97,5 @@ func main() {
 			fmt.Println("I'm sorry, that coupon code is not valid.")
 		}
 	}
-
 	fmt.Printf("That will be $%.2f", total)
 }
