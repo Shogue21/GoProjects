@@ -1,7 +1,10 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
+	"log"
+	"os"
 	"strings"
 )
 
@@ -25,6 +28,14 @@ var (
 	oldBooks  int
 )
 
+type CouponInfo struct {
+	Coupon   string  `json:"coupon,omitempty"`
+	Discount float64 `json:"discount,omitempty"`
+}
+type CouponDb struct {
+	Coupons []CouponInfo
+}
+
 func computeCost(new, old float64) float64 {
 	return new*newBookCost + old*oldBookCost
 }
@@ -38,8 +49,19 @@ func index(item string, list []string) int {
 	}
 	return itemIndex
 }
+
+func stringInSlice(a string, list []string) bool {
+	for _, b := range list {
+		if b == a {
+			return true
+		}
+	}
+	return false
+}
+
 func isValidCoupon(coupon string) bool {
-	return bool(coupon == "free-stuff" || coupon == "half-off")
+	return stringInSlice(coupon, coupons)
+
 }
 
 func applyCouponDiscount(cost float64, coupon string) float64 {
@@ -51,7 +73,6 @@ func applyCouponDiscount(cost float64, coupon string) float64 {
 }
 
 func main() {
-
 	fmt.Println("Welcome to Bargain Books!")
 	fmt.Printf("New books are $%.2f each.\n", newBookCost)
 	fmt.Printf("Old books are $%.2f each.\n", oldBookCost)
@@ -86,6 +107,16 @@ func main() {
 			break
 		}
 	}
+
+	f, err := os.Open("testingFolder\\coupons.json")
+	if nil != err {
+		log.Fatalln(err)
+	}
+	defer f.Close()
+	dec := json.NewDecoder(f)
+	db := CouponDb{}
+	dec.Decode(&db)
+
 	if hasCoupon == "y" {
 		fmt.Println("What is your coupon? ")
 		var coupon string
