@@ -3,6 +3,7 @@ package main
 import (
 	"encoding/json"
 	"fmt"
+	"io/ioutil"
 	"log"
 	"os"
 	"strings"
@@ -15,6 +16,7 @@ const (
 )
 
 var (
+	db      []CouponInfo
 	coupons = []string{
 		"free-stuff",
 		"half-off",
@@ -28,12 +30,10 @@ var (
 	oldBooks  int
 )
 
+//CouponInfo is...
 type CouponInfo struct {
 	Coupon   string  `json:"coupon,omitempty"`
 	Discount float64 `json:"discount,omitempty"`
-}
-type CouponDb struct {
-	Coupons []CouponInfo
 }
 
 func computeCost(new, old float64) float64 {
@@ -58,7 +58,6 @@ func stringInSlice(a string, list []string) bool {
 	}
 	return false
 }
-
 func isValidCoupon(coupon string) bool {
 	return stringInSlice(coupon, coupons)
 
@@ -73,10 +72,30 @@ func applyCouponDiscount(cost float64, coupon string) float64 {
 }
 
 func main() {
+
+	f, err := os.Open("booksBenchmark\\coupons.json")
+	if nil != err {
+		log.Fatalln(err)
+	}
+	defer f.Close()
+	// dec := json.NewDecoder(f)
+	// err := json.Unmarshal(test, &coupons)
+	// if err != nil {
+	// 	fmt.Print("Error:", err)
+	// }
+	// fmt.Println(coupons)
+	// fmt.Println(string(test))
+	var db []CouponInfo
+	bytes, err := ioutil.ReadAll(f)
+	if err != nil {
+		panic(err)
+	}
+	json.Unmarshal(bytes, &db)
+	fmt.Println(db)
+
 	fmt.Println("Welcome to Bargain Books!")
 	fmt.Printf("New books are $%.2f each.\n", newBookCost)
 	fmt.Printf("Old books are $%.2f each.\n", oldBookCost)
-
 	for {
 		fmt.Println("How many new books are you buying today?")
 		fmt.Scanln(&newBooks)
@@ -107,15 +126,6 @@ func main() {
 			break
 		}
 	}
-
-	f, err := os.Open("testingFolder\\coupons.json")
-	if nil != err {
-		log.Fatalln(err)
-	}
-	defer f.Close()
-	dec := json.NewDecoder(f)
-	db := CouponDb{}
-	dec.Decode(&db)
 
 	if hasCoupon == "y" {
 		fmt.Println("What is your coupon? ")
