@@ -16,7 +16,9 @@ const (
 )
 
 var (
-	db      []CouponInfo
+	db []CouponInfo
+
+	// coupons and discount are the original way of getting coupon information that I'm trying to change.
 	coupons = []string{
 		"free-stuff",
 		"half-off",
@@ -36,13 +38,15 @@ type CouponInfo struct {
 	Discount float64 `json:"discount,omitempty"`
 }
 
+// Adds the cost of new and old books being purchased together.
 func computeCost(new, old float64) float64 {
 	return new*newBookCost + old*oldBookCost
 }
 
-func index(item string, list []string) int {
+//Indexing tool used in applyCouponDiscount
+func index(item string, array []string) int {
 	itemIndex := 0
-	for i, c := range list {
+	for i, c := range array {
 		if c == item {
 			itemIndex = i
 		}
@@ -50,19 +54,23 @@ func index(item string, list []string) int {
 	return itemIndex
 }
 
-func stringInSlice(a string, list []string) bool {
-	for _, b := range list {
+// Checks if string (a) is in provided array.
+func stringInSlice(a string, array []string) bool {
+	for _, b := range array {
 		if b == a {
 			return true
 		}
 	}
 	return false
 }
+
+// Uses stringInSlice to check if the provided coupon is valid.
 func isValidCoupon(coupon string) bool {
 	return stringInSlice(coupon, coupons)
 
 }
 
+// Applies the discount associated with the coupon provided, if it is a valid coupon.
 func applyCouponDiscount(cost float64, coupon string) float64 {
 	couponIndex := index(coupon, coupons)
 	if isValidCoupon(coupon) {
@@ -72,19 +80,12 @@ func applyCouponDiscount(cost float64, coupon string) float64 {
 }
 
 func main() {
-
+	// Importing json file and getting its' contents.
 	f, err := os.Open("booksBenchmark\\coupons.json")
 	if nil != err {
 		log.Fatalln(err)
 	}
 	defer f.Close()
-	// dec := json.NewDecoder(f)
-	// err := json.Unmarshal(test, &coupons)
-	// if err != nil {
-	// 	fmt.Print("Error:", err)
-	// }
-	// fmt.Println(coupons)
-	// fmt.Println(string(test))
 	var db []CouponInfo
 	bytes, err := ioutil.ReadAll(f)
 	if err != nil {
@@ -93,6 +94,7 @@ func main() {
 	json.Unmarshal(bytes, &db)
 	fmt.Println(db)
 
+	// Main Program starts here.
 	fmt.Println("Welcome to Bargain Books!")
 	fmt.Printf("New books are $%.2f each.\n", newBookCost)
 	fmt.Printf("Old books are $%.2f each.\n", oldBookCost)
