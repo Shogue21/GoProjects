@@ -19,14 +19,14 @@ var (
 	db []CouponInfo
 
 	// coupons and discount are the original way of getting coupon information that I'm trying to change.
-	coupons = []string{
-		"free-stuff",
-		"half-off",
-	}
-	discounts = []float64{
-		0.0,
-		0.5,
-	}
+	// coupons = []string{
+	// 	"free-stuff",
+	// 	"half-off",
+	// }
+	// discounts = []float64{
+	// 	0.0,
+	// 	0.5,
+	// }
 	hasCoupon string
 	newBooks  int
 	oldBooks  int
@@ -66,22 +66,27 @@ func stringInSlice(a string, array []string) bool {
 
 // Uses stringInSlice to check if the provided coupon is valid.
 func isValidCoupon(coupon string) bool {
-	return stringInSlice(coupon, coupons)
-
+	for _, i := range db {
+		if i.Coupon == coupon {
+			return true
+		}
+	}
+	return false
 }
 
 // Applies the discount associated with the coupon provided, if it is a valid coupon.
 func applyCouponDiscount(cost float64, coupon string) float64 {
-	couponIndex := index(coupon, coupons)
 	if isValidCoupon(coupon) {
-		cost = cost * discounts[couponIndex]
+		for _, i := range db {
+			cost = cost * i.Discount
+		}
 	}
 	return cost
 }
 
 func main() {
 	// Importing json file and getting its' contents.
-	f, err := os.Open("booksBenchmark\\coupons.json")
+	f, err := os.Open("booksBenchmark/coupons.json")
 	if nil != err {
 		log.Fatalln(err)
 	}
@@ -93,7 +98,13 @@ func main() {
 	}
 	json.Unmarshal(bytes, &db)
 	fmt.Println(db)
-
+	for idx, i := range db {
+		fmt.Println("idx", idx)
+		fmt.Println("i", i)
+		if i.Coupon == "half-off" {
+			fmt.Println("hi")
+		}
+	}
 	// Main Program starts here.
 	fmt.Println("Welcome to Bargain Books!")
 	fmt.Printf("New books are $%.2f each.\n", newBookCost)
@@ -103,6 +114,8 @@ func main() {
 		fmt.Scanln(&newBooks)
 		if newBooks < 0 {
 			fmt.Println("Please select a value of 0 or greater.")
+		} else if err != nil {
+			fmt.Println("Please select a value of 0 or greater")
 		} else {
 			break
 		}
