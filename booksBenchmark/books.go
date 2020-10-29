@@ -73,7 +73,7 @@ func main() {
 	fmt.Printf("Old books are $%.2f each.\n", oldBookCost)
 	for {
 		fmt.Println("How many new books are you buying today?")
-		_, err := fmt.Scanf("%d", &newBooks)
+		_, err := fmt.Scanln(&newBooks)
 		if err != nil {
 			fmt.Println("Please select a value of 0 or greater.")
 			continue
@@ -86,7 +86,7 @@ func main() {
 	}
 	for {
 		fmt.Println("How many old books are you buying today?")
-		_, err := fmt.Scanf("%d", &oldBooks)
+		_, err := fmt.Scanln(&oldBooks)
 		if err != nil {
 			fmt.Println("Please select a value of 0 or greater.")
 			continue
