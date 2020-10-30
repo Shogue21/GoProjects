@@ -1,11 +1,13 @@
 package main
 
 import (
+	"encoding/csv"
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
 	"log"
 	"os"
+	"strconv"
 	"strings"
 )
 
@@ -20,12 +22,33 @@ var (
 	hasCoupon string
 	newBooks  int
 	oldBooks  int
+	coupon    string
+	total     float64
+	purchase  PurchaseInfo
 )
 
 //CouponInfo is...
 type CouponInfo struct {
 	Coupon   string  `json:"coupon,omitempty"`
 	Discount float64 `json:"discount,omitempty"`
+}
+
+//PurchaseInfo is...
+type PurchaseInfo struct {
+	NewBooks int     `json:"New"`
+	OldBooks int     `json:"Old"`
+	Coupon   string  `json:"Coupon"`
+	Total    float64 `json:"Total"`
+}
+
+//EncodeAsStrings is...
+func (user PurchaseInfo) EncodeAsStrings() (ss []string) {
+	ss = make([]string, 4)
+	ss[0] = strconv.Itoa(user.NewBooks)
+	ss[1] = strconv.Itoa(user.OldBooks)
+	ss[2] = user.Coupon
+	ss[3] = strconv.FormatFloat(user.Total, 'f', 2, 64)
+	return
 }
 
 // Adds the cost of new and old books being purchased together.
@@ -110,7 +133,6 @@ func main() {
 	}
 	if hasCoupon == "y" {
 		fmt.Println("What is your coupon?")
-		var coupon string
 		fmt.Scanln(&coupon)
 		if isValidCoupon(coupon) {
 			total = applyCouponDiscount(total, coupon)
@@ -120,4 +142,29 @@ func main() {
 		}
 	}
 	fmt.Printf("That will be $%.2f", total)
+
+	purchase := []PurchaseInfo{
+		{newBooks,
+			oldBooks,
+			coupon,
+			total},
+	}
+
+	purchases, err := os.OpenFile("booksBenchmark/purchases.csv", os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
+	if err != nil {
+		log.Fatalln(err)
+	}
+	defer purchases.Close()
+
+	writer := csv.NewWriter(purchases)
+	for _, info := range purchase {
+		ss := info.EncodeAsStrings()
+		writer.Write(ss)
+	}
+	writer.Flush()
+
+	err = writer.Error()
+	if err != nil {
+		log.Fatalln(err)
+	}
 }
