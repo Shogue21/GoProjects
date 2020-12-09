@@ -9,6 +9,8 @@ import (
 	"os"
 	"strconv"
 	"strings"
+
+	_ "github.com/mattn/go-sqlite3"
 )
 
 const (
@@ -79,6 +81,7 @@ func applyCouponDiscount(cost float64, coupon string) float64 {
 }
 
 func main() {
+
 	// Importing json file and getting its' contents.
 	f, err := os.Open("booksBenchmark/coupons.json")
 	if nil != err {
@@ -97,11 +100,7 @@ func main() {
 	for {
 		fmt.Println("How many new books are you buying today?")
 		_, err := fmt.Scanln(&newBooks)
-		if err != nil {
-			fmt.Println("Please select a value of 0 or greater.")
-			continue
-		}
-		if newBooks < 0 {
+		if err != nil || newBooks < 0 {
 			fmt.Println("Please select a value of 0 or greater.")
 		} else {
 			break
@@ -110,11 +109,7 @@ func main() {
 	for {
 		fmt.Println("How many old books are you buying today?")
 		_, err := fmt.Scanln(&oldBooks)
-		if err != nil {
-			fmt.Println("Please select a value of 0 or greater.")
-			continue
-		}
-		if oldBooks < 0 {
+		if err != nil || oldBooks < 0 {
 			fmt.Println("Please select a value of 0 or greater.")
 		} else {
 			break
